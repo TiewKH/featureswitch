@@ -1,4 +1,4 @@
-package com.featureswitch.featureswitch.dto;
+package com.featureswitch.featureswitch.model;
 
 import lombok.Data;
 

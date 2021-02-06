@@ -1,7 +1,8 @@
 package com.featureswitch.featureswitch.controller;
 
-import com.featureswitch.featureswitch.dto.FeatureDto;
-import com.featureswitch.featureswitch.dto.GetPermissionResponse;
+import com.featureswitch.featureswitch.exceptions.DataNotFoundException;
+import com.featureswitch.featureswitch.model.AddPermissionRequest;
+import com.featureswitch.featureswitch.model.GetPermissionResponse;
 import com.featureswitch.featureswitch.service.userfeature.UserFeatureService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +18,7 @@ public class FeatureController {
     private final UserFeatureService userFeatureService;
 
     @GetMapping
-    public ResponseEntity<GetPermissionResponse> getPermission(@RequestParam String email, @RequestParam String featureName) {
+    public ResponseEntity<GetPermissionResponse> getPermission(@RequestParam String email, @RequestParam String featureName) throws DataNotFoundException {
         boolean isEnabled = userFeatureService.userIsEnabled(email, featureName);
         GetPermissionResponse getPermissionResponse = new GetPermissionResponse();
         getPermissionResponse.setEnabled(isEnabled);
@@ -25,13 +26,9 @@ public class FeatureController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> addPermission(@RequestBody FeatureDto featureDto) {
-        log.debug(featureDto.toString());
-        if (userFeatureService.updateByUserEmailAndFeatureName(
-                featureDto.getEmail(), featureDto.getFeatureName(), featureDto.isEnable()) != null) {
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.status(304).build();
-        }
+    public ResponseEntity<Void> addPermission(@RequestBody AddPermissionRequest addPermissionRequest) throws DataNotFoundException {
+        log.debug(addPermissionRequest.toString());
+        userFeatureService.updateByUserEmailAndFeatureName(addPermissionRequest.getEmail(), addPermissionRequest.getFeatureName(), addPermissionRequest.isEnable());
+        return ResponseEntity.ok().build();
     }
 }
