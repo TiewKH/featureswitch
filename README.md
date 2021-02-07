@@ -8,6 +8,5 @@ curl "localhost:8080/feature?email=tiewkeehui95@hotmail.com&featureName=CREATE%2
 
 To add a new permission for a user-feature pair
 ```
-curl -X POST -H "Content-Type: application/json" -d "{\"featureName\": \"CREATE USER\", \"email\": \"tiewkeehui95@hotmail.com\"
-, \"enabled\": false}" "localhost:8080/feature" -i
+curl -X POST -H "Content-Type: application/json" -d "{\"featureName\": \"CREATE USER\", \"email\": \"tiewkeehui95@hotmail.com\", \"enabled\": false}" "localhost:8080/feature" -i
 ```

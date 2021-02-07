@@ -1,10 +1,15 @@
 package com.featureswitch.featureswitch.entity;
 
-import lombok.Data;
+import lombok.*;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
-@Data
+@Getter
+@Setter
+@RequiredArgsConstructor
 @Entity
 @Table(name="USER")
 public class UserEntity {
@@ -15,4 +20,29 @@ public class UserEntity {
 
     @Column(name = "EMAIL", unique = true)
     private String email;
+
+    @OneToMany(mappedBy = "user")
+    Set<UserFeatureEntity> permissions = new HashSet<UserFeatureEntity>();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserEntity that = (UserEntity) o;
+        return userId == that.userId && email.equals(that.email) && Objects.equals(permissions, that.permissions);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userId);
+    }
+
+    @Override
+    public String toString() {
+        return "UserEntity{" +
+                "userId=" + userId +
+                ", email='" + email + '\'' +
+                ", permissions=" + permissions +
+                '}';
+    }
 }

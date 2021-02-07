@@ -19,7 +19,7 @@ public class FeatureController {
 
     @GetMapping
     public ResponseEntity<GetPermissionResponse> getPermission(@RequestParam String email, @RequestParam String featureName) throws DataNotFoundException {
-        boolean isEnabled = userFeatureService.userIsEnabled(email, featureName);
+        boolean isEnabled = userFeatureService.userHasPermission(email, featureName);
         GetPermissionResponse getPermissionResponse = new GetPermissionResponse();
         getPermissionResponse.setEnabled(isEnabled);
         return ResponseEntity.ok(getPermissionResponse);
@@ -28,7 +28,7 @@ public class FeatureController {
     @PostMapping
     public ResponseEntity<Void> addPermission(@RequestBody AddPermissionRequest addPermissionRequest) throws DataNotFoundException {
         log.debug(addPermissionRequest.toString());
-        userFeatureService.updateByUserEmailAndFeatureName(addPermissionRequest.getEmail(), addPermissionRequest.getFeatureName(), addPermissionRequest.isEnable());
+        userFeatureService.updatePermissionByUserEmailAndFeatureName(addPermissionRequest.getEmail(), addPermissionRequest.getFeatureName(), addPermissionRequest.isEnable());
         return ResponseEntity.ok().build();
     }
 }

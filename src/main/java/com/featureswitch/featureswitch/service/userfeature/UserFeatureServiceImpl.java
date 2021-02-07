@@ -20,13 +20,13 @@ public class UserFeatureServiceImpl implements UserFeatureService{
     private final UserFeatureRepository userFeatureRepository;
 
     @Override
-    public UserFeatureEntity updateByUserEmailAndFeatureName(String userEmail, String featureName, boolean enable) throws DataNotFoundException {
+    public UserFeatureEntity updatePermissionByUserEmailAndFeatureName(String userEmail, String featureName, boolean enable) throws DataNotFoundException {
 
         UserEntity user;
         try {
             user = userService.getUserByEmail(userEmail);
         } catch (DataNotFoundException ex) {
-            log.info("updateByUserEmailAndFeatureName(): User not found");
+            log.info("updatePermissionByUserEmailAndFeatureName(): User not found");
             throw ex;
         }
 
@@ -34,23 +34,24 @@ public class UserFeatureServiceImpl implements UserFeatureService{
         try {
             feature = featureService.getFeatureByName(featureName);
         } catch (DataNotFoundException ex) {
-            log.info("updateByUserEmailAndFeatureName(): Feature not found");
+            log.info("updatePermissionByUserEmailAndFeatureName(): Feature not found");
             throw ex;
         }
 
-        UserFeatureEntity userFeature = userFeatureRepository.findByUserIdAndFeatureId(user.getUserId(), feature.getFeatureId());
+        UserFeatureEntity userFeature = userFeatureRepository.findByUserAndFeature(user, feature);
 
         if (userFeature != null && !enable) {
             // If there is a record in the table and we want to disable it, delete it from the table
             userFeatureRepository.delete(userFeature);
-            log.info("User is disabled");
+            log.info("updatePermissionByUserEmailAndFeatureName(): User state changed from enabled to disabled");
             return userFeature;
         } else if (userFeature == null && enable) {
-            // If there is not a record in the table and we want to enable a feature, add it to the table
+            // If there is not a record in the
+            // table and we want to enable a feature, add it to the table
             UserFeatureEntity newUserFeature = new UserFeatureEntity();
-            newUserFeature.setUserId(user.getUserId());
-            newUserFeature.setFeatureId(feature.getFeatureId());
-            log.info("User is enabled");
+            newUserFeature.setUser(user);
+            newUserFeature.setFeature(feature);
+            log.info("updatePermissionByUserEmailAndFeatureName(): User state changed from disabled to enabled");
             return userFeatureRepository.save(newUserFeature);
         }
 
@@ -58,31 +59,35 @@ public class UserFeatureServiceImpl implements UserFeatureService{
     }
 
     @Override
-    public boolean userIsEnabled(String userEmail, String featureName) throws DataNotFoundException{
+    public boolean userHasPermission(String userEmail, String featureName) throws DataNotFoundException{
 
         UserEntity user;
         try {
             user = userService.getUserByEmail(userEmail);
         } catch (DataNotFoundException ex) {
-            log.info("userIsEnabled(): User not found");
+            log.info("userHasPermission(): User not found");
             throw ex;
         }
+
+        log.debug(user.toString());
 
         FeatureEntity feature;
         try {
             feature = featureService.getFeatureByName(featureName);
         } catch (DataNotFoundException ex) {
-            log.info("userIsEnabled(): Feature not found");
+            log.info("userHasPermission(): Feature not found");
             throw ex;
         }
 
-        UserFeatureEntity userFeature = userFeatureRepository.findByUserIdAndFeatureId(user.getUserId(), feature.getFeatureId());
+        log.debug(feature.toString());
+
+        UserFeatureEntity userFeature = userFeatureRepository.findByUserAndFeature(user, feature);
         if (userFeature != null) {
-            log.info("User is enabled");
+            log.info("userHasPermission(): User is enabled");
             return true;
         }
 
-        log.info("User is not enabled");
+        log.info("userHasPermission(): User is not enabled");
         return false;
     }
 }

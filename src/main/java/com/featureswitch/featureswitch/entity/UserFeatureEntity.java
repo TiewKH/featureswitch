@@ -1,10 +1,13 @@
 package com.featureswitch.featureswitch.entity;
 
-import lombok.Data;
+import lombok.*;
 
 import javax.persistence.*;
+import java.util.Objects;
 
-@Data
+@Getter
+@Setter
+@RequiredArgsConstructor
 @Entity
 @Table(name="USER_FEATURE")
 public class UserFeatureEntity {
@@ -13,9 +16,33 @@ public class UserFeatureEntity {
     @Column(name = "ID")
     private long id;
 
-    @Column(name = "USER_ID")
-    private long userId;
+    @ManyToOne
+    @JoinColumn(name = "USER_ID")
+    private UserEntity user;
 
-    @Column(name = "FEATURE_ID")
-    private long featureId;
+    @ManyToOne
+    @JoinColumn(name = "FEATURE_ID")
+    private FeatureEntity feature;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserFeatureEntity that = (UserFeatureEntity) o;
+        return id == that.id && user.equals(that.user) && feature.equals(that.feature);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "UserFeatureEntity{" +
+                "id=" + id +
+                ", user=" + user.getEmail() +
+                ", feature=" + feature.getFeatureName() +
+                '}';
+    }
 }
