@@ -7,7 +7,6 @@ import java.util.Objects;
 
 @Getter
 @Setter
-@RequiredArgsConstructor
 @Entity
 @Table(name="USER_FEATURE")
 public class UserFeatureEntity {

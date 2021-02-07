@@ -4,5 +4,5 @@ import lombok.Data;
 
 @Data
 public class GetPermissionResponse {
-    private boolean enabled;
+    private boolean canAccess;
 }

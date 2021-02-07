@@ -21,7 +21,7 @@ public class FeatureController {
     public ResponseEntity<GetPermissionResponse> getPermission(@RequestParam String email, @RequestParam String featureName) throws DataNotFoundException {
         boolean isEnabled = userFeatureService.userHasPermission(email, featureName);
         GetPermissionResponse getPermissionResponse = new GetPermissionResponse();
-        getPermissionResponse.setEnabled(isEnabled);
+        getPermissionResponse.setCanAccess(isEnabled);
         return ResponseEntity.ok(getPermissionResponse);
     }
 
