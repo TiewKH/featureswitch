@@ -1,7 +1,7 @@
 # Moneylion Technical Assessment
 
 ### Curl commands for Windows
-To check whether a user is enabled for a certain feature
+To check whether a user has access to a certain feature
 ```
 curl "localhost:8080/feature?email=tiewkeehui95@hotmail.com&featureName=CREATE%20USER"
 ```
