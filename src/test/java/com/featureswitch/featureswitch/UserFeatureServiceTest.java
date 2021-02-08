@@ -3,12 +3,11 @@ package com.featureswitch.featureswitch;
 import com.featureswitch.featureswitch.entity.FeatureEntity;
 import com.featureswitch.featureswitch.entity.UserEntity;
 import com.featureswitch.featureswitch.entity.UserFeatureEntity;
+import com.featureswitch.featureswitch.exceptions.AddFailedException;
 import com.featureswitch.featureswitch.exceptions.DataNotFoundException;
 import com.featureswitch.featureswitch.repository.UserFeatureRepository;
-import com.featureswitch.featureswitch.repository.UserRepository;
 import com.featureswitch.featureswitch.service.feature.FeatureService;
 import com.featureswitch.featureswitch.service.user.UserService;
-import com.featureswitch.featureswitch.service.user.UserServiceImpl;
 import com.featureswitch.featureswitch.service.userfeature.UserFeatureService;
 import com.featureswitch.featureswitch.service.userfeature.UserFeatureServiceImpl;
 import org.junit.Before;
@@ -19,8 +18,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UserFeatureServiceTest {
@@ -70,8 +68,7 @@ public class UserFeatureServiceTest {
 
     @Test
     public void testGetUserPermissionUserDoesNotExist() throws Exception {
-        when(userService.getUserByEmail(userEntity.getEmail())).thenReturn(userEntity);
-        when(featureService.getFeatureByName(featureEntity.getFeatureName())).thenThrow(DataNotFoundException.class);
+        when(userService.getUserByEmail(userEntity.getEmail())).thenThrow(DataNotFoundException.class);
 
         assertThrows(DataNotFoundException.class, () -> {
             userFeatureService.userHasPermission(userEntity.getEmail(), featureEntity.getFeatureName());
@@ -81,12 +78,86 @@ public class UserFeatureServiceTest {
     @Test
     public void testGetUserPermissionFeatureDoesNotExist() throws Exception {
         when(userService.getUserByEmail(userEntity.getEmail())).thenReturn(userEntity);
-
-        FeatureEntity featureEntity = new FeatureEntity(1L, "Test Feature", null);
         when(featureService.getFeatureByName(featureEntity.getFeatureName())).thenThrow(DataNotFoundException.class);
 
         assertThrows(DataNotFoundException.class, () -> {
             userFeatureService.userHasPermission(userEntity.getEmail(), featureEntity.getFeatureName());
+        });
+    }
+
+    @Test
+    public void testAddUserPermissionSuccessfullyEnable() throws Exception {
+        when(userService.getUserByEmail(userEntity.getEmail())).thenReturn(userEntity);
+        when(featureService.getFeatureByName(featureEntity.getFeatureName())).thenReturn(featureEntity);
+        when(userFeatureRepository.findByUserAndFeature(userEntity, featureEntity)).thenReturn(null);
+
+        UserFeatureEntity userFeatureEntity = new UserFeatureEntity();
+        userFeatureEntity.setUser(userEntity);
+        userFeatureEntity.setFeature(featureEntity);
+
+        UserFeatureEntity addedUserFeatureEntity = new UserFeatureEntity(1L, userEntity, featureEntity);
+
+        when(userFeatureRepository.save(userFeatureEntity)).thenReturn(addedUserFeatureEntity);
+
+        UserFeatureEntity newUserFeatureEntity = userFeatureService.addPermissionByUserEmailAndFeatureName(userEntity.getEmail(), featureEntity.getFeatureName(), true);
+        assertThat(newUserFeatureEntity).isNotNull();
+        assertThat(newUserFeatureEntity).isEqualTo(addedUserFeatureEntity);
+    }
+
+    @Test
+    public void testAddUserPermissionSuccessfullyDisable() throws Exception {
+        when(userService.getUserByEmail(userEntity.getEmail())).thenReturn(userEntity);
+        when(featureService.getFeatureByName(featureEntity.getFeatureName())).thenReturn(featureEntity);
+
+        UserFeatureEntity userFeatureEntity = new UserFeatureEntity(1L, userEntity, featureEntity);
+        when(userFeatureRepository.findByUserAndFeature(userEntity, featureEntity)).thenReturn(userFeatureEntity);
+
+        UserFeatureEntity newUserFeatureEntity = userFeatureService.addPermissionByUserEmailAndFeatureName(userEntity.getEmail(), featureEntity.getFeatureName(), false);
+        assertThat(newUserFeatureEntity).isNotNull();
+        assertThat(newUserFeatureEntity).isEqualTo(userFeatureEntity);
+        verify(userFeatureRepository, times(1)).delete(userFeatureEntity);
+    }
+
+    @Test
+    public void testAddUserPermissionAlreadyEnabled() throws Exception {
+        when(userService.getUserByEmail(userEntity.getEmail())).thenReturn(userEntity);
+        when(featureService.getFeatureByName(featureEntity.getFeatureName())).thenReturn(featureEntity);
+
+        UserFeatureEntity userFeatureEntity = new UserFeatureEntity(1L, userEntity, featureEntity);
+        when(userFeatureRepository.findByUserAndFeature(userEntity, featureEntity)).thenReturn(userFeatureEntity);
+
+        assertThrows(AddFailedException.class, () -> {
+            userFeatureService.addPermissionByUserEmailAndFeatureName(userEntity.getEmail(), featureEntity.getFeatureName(), true);
+        });
+    }
+
+    @Test
+    public void testAddUserPermissionAlreadyDisabled() throws Exception {
+        when(userService.getUserByEmail(userEntity.getEmail())).thenReturn(userEntity);
+        when(featureService.getFeatureByName(featureEntity.getFeatureName())).thenReturn(featureEntity);
+        when(userFeatureRepository.findByUserAndFeature(userEntity, featureEntity)).thenReturn(null);
+
+        assertThrows(AddFailedException.class, () -> {
+            userFeatureService.addPermissionByUserEmailAndFeatureName(userEntity.getEmail(), featureEntity.getFeatureName(), false);
+        });
+    }
+
+    @Test
+    public void testAddUserPermissionUserDoesNotExist() throws Exception {
+        when(userService.getUserByEmail(userEntity.getEmail())).thenThrow(DataNotFoundException.class);
+
+        assertThrows(AddFailedException.class, () -> {
+            userFeatureService.addPermissionByUserEmailAndFeatureName(userEntity.getEmail(), featureEntity.getFeatureName(), true);
+        });
+    }
+
+    @Test
+    public void testAddUserPermissionFeatureDoesNotExist() throws Exception {
+        when(userService.getUserByEmail(userEntity.getEmail())).thenReturn(userEntity);
+        when(featureService.getFeatureByName(featureEntity.getFeatureName())).thenThrow(DataNotFoundException.class);
+
+        assertThrows(AddFailedException.class, () -> {
+            userFeatureService.addPermissionByUserEmailAndFeatureName(userEntity.getEmail(), featureEntity.getFeatureName(), true);
         });
     }
 }
