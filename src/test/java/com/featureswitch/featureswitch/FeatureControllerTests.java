@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 @RunWith(SpringJUnit4ClassRunner.class)
 @ActiveProfiles("test")
 @WebMvcTest(FeatureController.class)
-public class FeatureControllerTest {
+public class FeatureControllerTests {
 
     @Autowired
     private MockMvc mockMvc;
@@ -105,7 +105,6 @@ public class FeatureControllerTest {
 
         given(userFeatureService.addPermissionByUserEmailAndFeatureName(any(), any(), anyBoolean())).willThrow(AddFailedException.class);
 
-        System.out.println(asJsonString(addPermissionRequest));
         mockMvc.perform(post("/feature")
                 .contentType("application/json")
                 .content(asJsonString(addPermissionRequest))

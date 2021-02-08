@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class UserFeatureServiceTest {
+public class UserFeatureServiceTests {
 
     @Mock
     private UserService userService;
@@ -34,8 +34,8 @@ public class UserFeatureServiceTest {
 
     private UserFeatureService userFeatureService;
 
-    private UserEntity userEntity = new UserEntity(1L, "test@test.com", null);
-    private FeatureEntity featureEntity = new FeatureEntity(1L, "Test Feature", null);
+    private final UserEntity userEntity = new UserEntity(1L, "test@test.com", null);
+    private final FeatureEntity featureEntity = new FeatureEntity(1L, "Test Feature", null);
 
     @Before
     public void setUp() throws Exception {
