@@ -1,12 +1,14 @@
 package com.featureswitch.featureswitch.controller;
 
 import com.featureswitch.featureswitch.exceptions.DataNotFoundException;
+import com.featureswitch.featureswitch.exceptions.AddFailedException;
 import com.featureswitch.featureswitch.model.AddPermissionRequest;
 import com.featureswitch.featureswitch.model.GetPermissionResponse;
 import com.featureswitch.featureswitch.service.userfeature.UserFeatureService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
@@ -26,9 +28,9 @@ public class FeatureController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> addPermission(@RequestBody AddPermissionRequest addPermissionRequest) throws DataNotFoundException {
-        log.debug(addPermissionRequest.toString());
-        userFeatureService.updatePermissionByUserEmailAndFeatureName(addPermissionRequest.getEmail(), addPermissionRequest.getFeatureName(), addPermissionRequest.isEnable());
+    public ResponseEntity<Void> addPermission(@Validated @RequestBody AddPermissionRequest addPermissionRequest) throws AddFailedException {
+        log.info(addPermissionRequest.toString());
+        userFeatureService.addPermissionByUserEmailAndFeatureName(addPermissionRequest.getEmail(), addPermissionRequest.getFeatureName(), addPermissionRequest.getEnable().booleanValue());
         return ResponseEntity.ok().build();
     }
 }

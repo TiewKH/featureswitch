@@ -9,6 +9,7 @@ import java.util.Set;
 
 @Getter
 @Setter
+@AllArgsConstructor
 @Entity
 @Table(name="FEATURE")
 public class FeatureEntity {

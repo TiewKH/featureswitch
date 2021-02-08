@@ -4,6 +4,7 @@ import com.featureswitch.featureswitch.entity.FeatureEntity;
 import com.featureswitch.featureswitch.entity.UserEntity;
 import com.featureswitch.featureswitch.entity.UserFeatureEntity;
 import com.featureswitch.featureswitch.exceptions.DataNotFoundException;
+import com.featureswitch.featureswitch.exceptions.AddFailedException;
 import com.featureswitch.featureswitch.repository.UserFeatureRepository;
 import com.featureswitch.featureswitch.service.feature.FeatureService;
 import com.featureswitch.featureswitch.service.user.UserService;
@@ -20,42 +21,50 @@ public class UserFeatureServiceImpl implements UserFeatureService{
     private final UserFeatureRepository userFeatureRepository;
 
     @Override
-    public UserFeatureEntity updatePermissionByUserEmailAndFeatureName(String userEmail, String featureName, boolean enable) throws DataNotFoundException {
+    public UserFeatureEntity addPermissionByUserEmailAndFeatureName(String userEmail, String featureName, boolean enable) throws AddFailedException {
 
         UserEntity user;
         try {
             user = userService.getUserByEmail(userEmail);
         } catch (DataNotFoundException ex) {
-            log.info("updatePermissionByUserEmailAndFeatureName(): User not found");
-            throw ex;
+            log.info("addPermissionByUserEmailAndFeatureName(): User not found");
+            throw new AddFailedException(ex.getMessage());
         }
 
         FeatureEntity feature;
         try {
             feature = featureService.getFeatureByName(featureName);
         } catch (DataNotFoundException ex) {
-            log.info("updatePermissionByUserEmailAndFeatureName(): Feature not found");
-            throw ex;
+            log.info("addPermissionByUserEmailAndFeatureName(): Feature not found");
+            throw new AddFailedException(ex.getMessage());
         }
 
-        UserFeatureEntity userFeature = userFeatureRepository.findByUserAndFeature(user, feature);
+        UserFeatureEntity userFeatureEntity = userFeatureRepository.findByUserAndFeature(user, feature);
 
-        if (userFeature != null && !enable) {
-            // If there is a record in the table and we want to disable it, delete it from the table
-            userFeatureRepository.delete(userFeature);
-            log.info("updatePermissionByUserEmailAndFeatureName(): User state changed from enabled to disabled");
-            return userFeature;
-        } else if (userFeature == null && enable) {
-            // If there is not a record in the
-            // table and we want to enable a feature, add it to the table
-            UserFeatureEntity newUserFeature = new UserFeatureEntity();
-            newUserFeature.setUser(user);
-            newUserFeature.setFeature(feature);
-            log.info("updatePermissionByUserEmailAndFeatureName(): User state changed from disabled to enabled");
-            return userFeatureRepository.save(newUserFeature);
+        if (enable) {
+            // If there is no record and user wants to enable, add the record in the table
+            if (userFeatureEntity == null) {
+                UserFeatureEntity newUserFeatureEntity = new UserFeatureEntity();
+                newUserFeatureEntity.setUser(user);
+                newUserFeatureEntity.setFeature(feature);
+                log.info("addPermissionByUserEmailAndFeatureName(): User state changed from disabled to enabled");
+                return userFeatureRepository.save(newUserFeatureEntity);
+            }
+            // If there is a record and user wants to enable, do not modify
+            log.info("addPermissionByUserEmailAndFeatureName(): User is already enabled");
+            throw new AddFailedException("User is already enabled");
         }
 
-        return null;
+        // If there is no record and user wants to disable, do not modify
+        if (userFeatureEntity == null) {
+            log.info("addPermissionByUserEmailAndFeatureName(): User is already disabled");
+            throw new AddFailedException("User is already disabled");
+        }
+
+        // If there is a record and user wants to disable, delete it from the table
+        userFeatureRepository.delete(userFeatureEntity);
+        log.info("addPermissionByUserEmailAndFeatureName(): User state changed from enabled to disabled");
+        return userFeatureEntity;
     }
 
     @Override
