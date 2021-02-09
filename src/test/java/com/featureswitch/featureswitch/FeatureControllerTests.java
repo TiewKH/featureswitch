@@ -46,7 +46,7 @@ public class FeatureControllerTests {
     }
 
     @Test
-    public void testGetPermissionPermissionEnabledUser() throws Exception {
+    public void testGetPermissionSuccessfulEnabledUser() throws Exception {
         given(userFeatureService.userHasPermission(testEmail, testFeature)).willReturn(true);
         mockMvc.perform(get("/feature")
                 .param("email", testEmail)
@@ -56,7 +56,7 @@ public class FeatureControllerTests {
     }
 
     @Test
-    public void testGetPermissionDisabledUser() throws Exception {
+    public void testGetPermissionSuccessfulDisabledUser() throws Exception {
         given(userFeatureService.userHasPermission(testEmail, testFeature)).willReturn(false);
         mockMvc.perform(get("/feature")
                 .param("email", testEmail)
@@ -86,7 +86,7 @@ public class FeatureControllerTests {
     }
 
     @Test
-    public void testAddPermissionAddSuccess() throws Exception {
+    public void testAddPermissionSuccessful() throws Exception {
         AddPermissionRequest addPermissionRequest = new AddPermissionRequest(testEmail, testFeature, Boolean.TRUE);
 
         UserFeatureEntity userFeatureEntity = new UserFeatureEntity();

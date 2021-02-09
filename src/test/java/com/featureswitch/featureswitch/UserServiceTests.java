@@ -29,7 +29,7 @@ public class UserServiceTests {
     }
 
     @Test
-    public void testGetUserByEmailSuccessfully() throws Exception {
+    public void testGetUserByEmailSuccessful() throws Exception {
         UserEntity userEntity = new UserEntity(1L, "test@test.com", null);
         when(userRepository.findByEmail(userEntity.getEmail())).thenReturn(userEntity);
 

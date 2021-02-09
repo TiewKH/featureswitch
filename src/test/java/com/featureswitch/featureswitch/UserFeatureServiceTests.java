@@ -43,7 +43,7 @@ public class UserFeatureServiceTests {
     }
 
     @Test
-    public void testGetUserPermissionSuccessfullyNotEnabled() throws Exception {
+    public void testGetUserPermissionSuccessfulNotEnabled() throws Exception {
         when(userService.getUserByEmail(userEntity.getEmail())).thenReturn(userEntity);
         when(featureService.getFeatureByName(featureEntity.getFeatureName())).thenReturn(featureEntity);
         when(userFeatureRepository.findByUserAndFeature(userEntity, featureEntity)).thenReturn(null);
@@ -54,7 +54,7 @@ public class UserFeatureServiceTests {
     }
 
     @Test
-    public void testGetUserPermissionSuccessfullyEnabled() throws Exception {
+    public void testGetUserPermissionSuccessfulEnabled() throws Exception {
         when(userService.getUserByEmail(userEntity.getEmail())).thenReturn(userEntity);
         when(featureService.getFeatureByName(featureEntity.getFeatureName())).thenReturn(featureEntity);
 
@@ -86,7 +86,7 @@ public class UserFeatureServiceTests {
     }
 
     @Test
-    public void testAddUserPermissionSuccessfullyEnable() throws Exception {
+    public void testAddUserPermissionSuccessfulEnable() throws Exception {
         when(userService.getUserByEmail(userEntity.getEmail())).thenReturn(userEntity);
         when(featureService.getFeatureByName(featureEntity.getFeatureName())).thenReturn(featureEntity);
         when(userFeatureRepository.findByUserAndFeature(userEntity, featureEntity)).thenReturn(null);
@@ -105,7 +105,7 @@ public class UserFeatureServiceTests {
     }
 
     @Test
-    public void testAddUserPermissionSuccessfullyDisable() throws Exception {
+    public void testAddUserPermissionSuccessfulDisable() throws Exception {
         when(userService.getUserByEmail(userEntity.getEmail())).thenReturn(userEntity);
         when(featureService.getFeatureByName(featureEntity.getFeatureName())).thenReturn(featureEntity);
 

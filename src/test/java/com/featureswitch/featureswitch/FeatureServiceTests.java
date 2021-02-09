@@ -32,7 +32,7 @@ public class FeatureServiceTests {
     }
 
     @Test
-    public void testGetFeatureByNameSuccessfully() throws Exception {
+    public void testGetFeatureByNameSuccessful() throws Exception {
         FeatureEntity featureEntity = new FeatureEntity(1L, "Test Feature", null);
 
         when(featureRepository.findByFeatureName(any())).thenReturn(featureEntity);
