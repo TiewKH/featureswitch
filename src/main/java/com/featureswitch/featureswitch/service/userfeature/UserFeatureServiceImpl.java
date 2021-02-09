@@ -50,12 +50,12 @@ public class UserFeatureServiceImpl implements UserFeatureService{
                 log.info("addPermissionByUserEmailAndFeatureName(): User state changed from disabled to enabled");
                 return userFeatureRepository.save(newUserFeatureEntity);
             }
-            // If there is a record and user wants to enable, do not modify
+            // If there is a record and user wants to enable, do not need to modify
             log.info("addPermissionByUserEmailAndFeatureName(): User is already enabled");
             throw new AddFailedException("User is already enabled");
         }
 
-        // If there is no record and user wants to disable, do not modify
+        // If there is no record and user wants to disable, do not need to modify
         if (userFeatureEntity == null) {
             log.info("addPermissionByUserEmailAndFeatureName(): User is already disabled");
             throw new AddFailedException("User is already disabled");
