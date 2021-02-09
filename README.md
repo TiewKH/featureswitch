@@ -1,5 +1,16 @@
 # Moneylion Technical Assessment
 
+## Usage
+- To run Spring Boot application
+```
+mvn clean spring-boot:run
+```
+
+- To run unit tests
+```
+mvn clean test
+```
+
 ## Curl commands for Windows
 - To check whether a user has access to a certain feature
 ```
